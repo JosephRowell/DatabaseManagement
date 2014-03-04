@@ -24,14 +24,13 @@ limit 1;
 
 --3--
 
---I've been working forever on this. Still gonna keep trying--
---It returns nothing, but that can't be right--
 
-select name
-from products
-group by products.name, priceUSD
-having
-priceUSD > avg(priceUSD);
+select p.name
+from products p
+where p.priceUSD > (
+	select avg(p.priceUSD) from p
+);
+
 
 
 --4--
@@ -63,12 +62,10 @@ where a.city = 'New York';
 
 --7--
 
---will finish  tomorrowr --
+select o.ordno, round((o.qty * p.priceUSD) * (1 - c.discount / 100)) from orders o
+inner join customers c on c.cid = o.cid
+inner join products p on p.pid = o.pid
+group by o.ordno, c.discount, p.priceUSD
+order by ordno asc;
 
-select dollars from orders o 
-left outer join products p on p.priceUSD = o.dollars
-left outer join customers c on c.discount = o.dollars
-order by dollars desc
-having
- sum(o.qty * p.priceUSD * 1 - c.discount) = o.dollars 
 
